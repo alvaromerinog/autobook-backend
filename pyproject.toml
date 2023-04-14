@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "autobook-backend"
+version = "1.0.0"
+description = "Backend service for autobook application"
+authors = ["Alvaro Merino Gonzalo"]
+readme = "README.md"
+packages = [{include = "autobook_backend"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
