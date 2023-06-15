@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from backend.maintenances.domain.models import Vehicle
+from backend.maintenances.domain.models import Maintenance, Vehicle
 
 
 class VehiclesRepository(ABC):
@@ -11,6 +11,10 @@ class VehiclesRepository(ABC):
 
     @abstractmethod
     def find_by_id(self, vehicle_id: UUID) -> Vehicle:
+        raise NotImplementedError
+
+    @abstractmethod
+    def add_maintenance(self, vehicle_id: UUID, maintenance: Maintenance) -> None:
         raise NotImplementedError
 
     @abstractmethod

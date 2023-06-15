@@ -1,8 +1,9 @@
+from datetime import datetime
 import uuid
 
 import pytest
 
-from backend.maintenances.domain.models import Vehicle
+from backend.maintenances.domain.models import Maintenance, Vehicle
 from backend.maintenances.domain.repositories.vehicles_repository import VehiclesRepository
 from backend.maintenances.utils import get_uuid
 
@@ -21,6 +22,10 @@ class DummyVehiclesRepository(VehiclesRepository):
 
     def find_by_id(self, vehicle_id: uuid.UUID) -> Vehicle:
         return next(filter(lambda vehicle: vehicle.id == vehicle_id, self.vehicles), None)
+
+    def add_maintenance(self, vehicle_id: uuid.UUID, maintenance: Maintenance) -> None:
+        vehicle = self.find_by_id(vehicle_id)
+        vehicle.maintenances.append(maintenance)
 
     def commit(self) -> None:
         self.committed = True
@@ -91,3 +96,35 @@ def test_add_duplicated_vehicle():
     vehicle.id = get_uuid()
     with pytest.raises(Exception):
         vehicles_repository.add(vehicle)
+
+def test_add_maintenance():
+    # given
+    vehicle, vehicles_repository = create_vehicle()
+    maintenance = Maintenance(
+        id=get_uuid(),
+        type="Cambio",
+        components=["Aceite", "Filtro aceite"],
+        odometer=100,
+        performed_at=datetime.utcnow()
+    )
+
+    # when
+    vehicles_repository.add_maintenance(vehicle.id, maintenance)
+    vehicles_repository.commit()
+    vehicles_repository.close()
+
+    # then
+    vehicle.maintenances.append(maintenance)
+    assert vehicles_repository.vehicles == [vehicle]
+
+def create_vehicle():
+    vehicle = Vehicle(
+        id=get_uuid(),
+        name="dummy_vehicle",
+        registration="dummy_registration",
+        maintenances=[]
+    )
+    vehicles_repository = DummyVehiclesRepository()
+    vehicles_repository.add(vehicle)
+    vehicles_repository.commit()
+    return vehicle, vehicles_repository

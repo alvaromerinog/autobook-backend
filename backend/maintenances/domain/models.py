@@ -7,9 +7,11 @@ from uuid import UUID
 @dataclass
 class Maintenance:
     id: UUID
-    name: str
+    type: str
+    components: List[str]
     odometer: int
     performed_at: datetime
+
 
 
 @dataclass
